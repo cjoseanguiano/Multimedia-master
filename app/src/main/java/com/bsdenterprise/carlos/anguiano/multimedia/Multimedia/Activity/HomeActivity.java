@@ -34,7 +34,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private Button button;
     private String jid = "carchat@bsdenterprise.com";
-    private String user = "";
+    private String user = "Carlos Anguiano";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

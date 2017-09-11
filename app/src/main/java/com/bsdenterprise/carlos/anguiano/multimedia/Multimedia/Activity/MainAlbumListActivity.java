@@ -1,9 +1,7 @@
 package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -15,7 +13,7 @@ import android.view.MenuItem;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Adapter.ViewPagerAdapter;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment.PhotoAlbumFragment;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment.VideoAlbumFragment;
-import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Utils.Components;
+import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Utils.ApplicationSingleton;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
 
 public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlbumFragment.OnMediaSelectedPhotoAlbum, VideoAlbumFragment.OnMediaSelectedVideoAlbum {
@@ -47,17 +45,14 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
             String dataJid = getIntent().getExtras().getString(EXTRA_JID);
 
             if (data != null && data.trim().length() > 0) {
-//                String value = ApplicationSingleton.getInstance().getString(R.string.titleMultimedia);
-                Resources res = getResources();
-//                String val = Components.getString(data, dataJid);
-                String value = String.format(res.getString(R.string.titleMultimedia), data, dataJid);
-                Log.i(TAG, "onCreate: " + value);
+                String value = ApplicationSingleton.getInstance().getString(R.string.titleMultimedia);
                 body = String.format(value, data);
+                Log.i(TAG, "onCreate: " + value);
             } else {
+
                 String[] parts = dataJid.split("@");
                 String user = parts[0];
-                Resources resources = getResources();
-                String value = String.format(resources.getString(R.string.titleMultimedia, user, data));
+                String value = ApplicationSingleton.getInstance().getString(R.string.titleMultimedia);
                 body = String.format(value, user);
             }
         }
