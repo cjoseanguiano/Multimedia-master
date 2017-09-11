@@ -13,7 +13,8 @@ import android.view.MenuItem;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Adapter.ViewPagerAdapter;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment.PhotoAlbumFragment;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment.VideoAlbumFragment;
-import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Utils.ApplicationSingleton;
+import com.bsdenterprise.carlos.anguiano.multimedia.Utils.AndroidUtilities;
+import com.bsdenterprise.carlos.anguiano.multimedia.Utils.ApplicationSingleton;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
 
 public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlbumFragment.OnMediaSelectedPhotoAlbum, VideoAlbumFragment.OnMediaSelectedVideoAlbum {
@@ -47,13 +48,8 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
             if (data != null && data.trim().length() > 0) {
                 String value = ApplicationSingleton.getInstance().getString(R.string.titleMultimedia);
                 body = String.format(value, data);
-                Log.i(TAG, "onCreate: " + value);
             } else {
-
-                String[] parts = dataJid.split("@");
-                String user = parts[0];
-                String value = ApplicationSingleton.getInstance().getString(R.string.titleMultimedia);
-                body = String.format(value, user);
+                body = AndroidUtilities.cutString(dataJid,"@");
             }
         }
 

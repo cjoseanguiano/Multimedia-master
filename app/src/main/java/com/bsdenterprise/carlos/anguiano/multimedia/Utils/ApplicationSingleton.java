@@ -1,4 +1,4 @@
-package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Utils;
+package com.bsdenterprise.carlos.anguiano.multimedia.Utils;
 
 import android.app.Application;
 
