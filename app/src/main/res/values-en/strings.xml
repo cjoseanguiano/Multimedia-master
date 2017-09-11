@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Multimedia</string>
+    <string name="image">Image</string>
+    <string name="titleMultimedia">Sent to %1$s</string>
+    <string name="video">Video</string>
+    <string name="OK">OK</string>
+    <string name="about">About</string>
+    <string name="media">Media</string>
+    <string name="msg_type_your_message">Write your message…</string>
+    <string name="description">Description</string>
+    <string name="error_video">Error</string>
+    <string name="sendPhoto">Send Photo</string>
+    <string name="sendVideo">Send Video</string>
+    <string name="Done">echo</string>
+</resources>

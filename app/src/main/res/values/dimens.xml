@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="sub_medium_multimedia">14sp</dimen>
+    <dimen name="medium_small_text_multimedia">10sp</dimen>
+    <dimen name="medium_text_multimedia">16sp</dimen>
+    <dimen name="sub_medium_spacing_multimedia">10dp</dimen>
+    <dimen name="small_spacing_multimedia">8dp</dimen>
+    <dimen name="icon_elevation_multimedia">10dp</dimen>
+    <dimen name="icon_sub_width_height_multimedia">16dp</dimen>
+    <dimen name="fab_margin_multimedia">16dp</dimen>
+
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="forward_multimedia" type="id"/>
+    <item name="viewPagerMultimedia" type="id" />
+    <item name="viewImageMultimedia" type="id" />
+    <item name="info_multimedia" type="id" />
+</resources>

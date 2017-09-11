@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Utils.SquareRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/media_card_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/photo_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="2dp"
+        android:scaleType="centerCrop"
+        />
+    <TextView
+        android:id="@+id/photo_path"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:paddingStart="2dp"
+        android:textColor="@color/colorPrimary"
+        android:background="@color/colorAccent"
+        android:paddingEnd="2dp"
+        android:elevation="10dp"
+        android:textSize="@dimen/medium_small_text_multimedia"
+        android:maxLines="1"
+        android:layout_alignParentBottom="true"
+        tools:targetApi="lollipop" />
+    <com.mikepenz.iconics.view.IconicsImageView
+        android:id="@+id/gif_icon"
+        android:layout_width="@dimen/icon_sub_width_height_multimedia"
+        android:layout_height="@dimen/icon_sub_width_height_multimedia"
+        android:layout_marginBottom="2dp"
+        android:layout_marginStart="4dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:visibility="gone"
+        android:elevation="@dimen/icon_elevation_multimedia"
+        app:iiv_color="@color/colorPrimaryDark"
+        app:iiv_icon="gmd-gif"
+        tools:targetApi="lollipop" />
+    <com.mikepenz.iconics.view.IconicsImageView
+        android:id="@+id/icon"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:elevation="@dimen/icon_elevation_multimedia"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        app:iiv_color="@color/primary_title_black"
+        app:iiv_icon="gmd-play-circle-filled"
+        tools:targetApi="lollipop" />
+    </com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Utils.SquareRelativeLayout>

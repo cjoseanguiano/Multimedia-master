@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LoginBarLabels">
+        <attr name="left_buttonLabel" format="string" />
+        <attr name="right_buttonLabel" format="string" />
+
+    </declare-styleable>
+    <declare-styleable name="BlurredView">
+        <attr name="text" format="string" />
+        <attr name="percent" format="float" />
+    </declare-styleable>
+    <declare-styleable name="GridView">
+        <attr name="columnNumber" format="integer" />
+    </declare-styleable>
+</resources>
