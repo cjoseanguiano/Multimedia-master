@@ -3,12 +3,17 @@ package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.renderscript.Byte2;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Adapter.ViewPagerAdapter;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment.PhotoAlbumFragment;
@@ -23,6 +28,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     public static final String EXTRA_NAME = "sendUser";//Displays the user Name
     public static final String EXTRA_JID = "extra_jid";//Displays the user Jid
     public static final String EXTRA_RESULT_SELECTED_ALBUM = "selected_media_album";//Send album result
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     public static final String EXTRA_BUCKET = "extra_bucket";
     public static final String EXTRA_TYPE_ALBUM = "extra_type_album";
@@ -32,14 +38,37 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     public static final String EXTRA_BACK_SELECT = "extra_back_select";
     private String label_Photo;
     private String label_Video;
+    private FloatingActionButton fabAlbum;
+    private Toolbar toolbar;
+    private FloatingActionButton floatingActionButton;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+    private int mCurrentPagePosition = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_list_multimedia);
         Log.i(TAG, "onCreate: ");
+        startView();
         label_Photo = getResources().getString(R.string.image);
         label_Video = getResources().getString(R.string.video);
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tabLayout.getSelectedTabPosition() == 1) {
+                    Toast.makeText(MainAlbumListActivity.this, "Select A", Toast.LENGTH_SHORT).show();
+                    floatingActionButton.hide();
+
+                } else {
+                    Toast.makeText(MainAlbumListActivity.this, "Select B", Toast.LENGTH_SHORT).show();
+                    floatingActionButton.hide();
+                    dispatchTakePictureIntent();
+                }
+            }
+        });
+
 
         if (getIntent().hasExtra(EXTRA_NAME) || getIntent().hasExtra(EXTRA_JID)) {
             String data = getIntent().getExtras().getString(EXTRA_NAME);
@@ -49,23 +78,76 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
                 String value = ApplicationSingleton.getInstance().getString(R.string.titleMultimedia);
                 body = String.format(value, data);
             } else {
-                body = MultimediaUtilities.cutString(dataJid,"@");
+                body = MultimediaUtilities.cutString(dataJid, "@");
             }
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(body);
-
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
+
+//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//                Log.i(TAG, "onPageScrolled: ");
+//            }
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//                Log.i(TAG, "onPageSelected: ");
+//                if (position == 0) {
+//                    floatingActionButton.setImageResource(R.drawable.ic_add_a_photo);
+//                } else {
+//                    floatingActionButton.setImageResource(R.drawable.ic_videocam);
+//                }
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//                Log.i(TAG, "onPageScrollStateChanged: ");
+//            }
+//        });
+
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                Log.i(TAG, "onTabSelected: ");
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                Log.i(TAG, "onTabUnselected: ");
+                if (tab.getPosition() == 1) {
+                    floatingActionButton.setImageResource(R.drawable.ic_add_a_photo);
+                    floatingActionButton.show();
+
+                } else {
+                    floatingActionButton.setImageResource(R.drawable.ic_videocam);
+                    floatingActionButton.show();
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                Log.i(TAG, "onTabReselected: ");
+            }
+        });
+
+    }
+
+    private void startView() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fabAlbum);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -122,4 +204,16 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 
     }
 
+
+    private void dispatchTakePictureIntent() {
+        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePicture.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }
