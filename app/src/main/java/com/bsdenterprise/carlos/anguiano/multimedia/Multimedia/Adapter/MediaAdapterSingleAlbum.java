@@ -23,6 +23,7 @@ import com.bignerdranch.android.multiselector.SwappingHolder;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Interface.MediaSingleClicked;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Model.DataPicture;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
+import com.bsdenterprise.carlos.anguiano.multimedia.Utils.MultimediaUtilities;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -58,6 +59,7 @@ public class MediaAdapterSingleAlbum extends RecyclerView.Adapter<MediaAdapterSi
     private int contador;
     float screenWidth;
     float newHeight;
+    private final String file = "file://";
 
     public MediaAdapterSingleAlbum(Activity context, ArrayList<String> path_On, String typeBucket,
                                    List<DataPicture> listFilterBucket, String typeAlbum, MultiSelector mMultiSelector) {
@@ -235,10 +237,11 @@ public class MediaAdapterSingleAlbum extends RecyclerView.Adapter<MediaAdapterSi
 
         public void bindTo(MediaListHolder mediaListRowHolder, int i) {
             DataPicture message = itemList.get(i);
+            String uriImage = file + message.getFilePath();
+
             try {
                 if (message.getFileType().equalsIgnoreCase("video")) {
-                    showGlide(mediaListRowHolder, message);
-
+                    MultimediaUtilities.showGlide(uriImage, context, mediaListRowHolder.imageView);
                 } else {
                     if (pathSelected != null) {
                         for (String pathSelectedFile : pathSelected) {
@@ -246,7 +249,6 @@ public class MediaAdapterSingleAlbum extends RecyclerView.Adapter<MediaAdapterSi
                                 itemView.setSelected(!itemView.isSelected());
                                 if (!selectedMessages.contains(message)) {
                                     mMultiSelector.tapSelection(this);
-//                                    selectedMessages.add(message);
                                     if (pathSelected != null && pathSelected.size() > 0) {
                                         Log.i(TAG, "bindTo: ");
                                         selectedMessages.add(message);
@@ -256,30 +258,13 @@ public class MediaAdapterSingleAlbum extends RecyclerView.Adapter<MediaAdapterSi
                         }
 
                     }
-
-                    showGlide(mediaListRowHolder, message);
+                    Log.i(TAG, "bindTo: " + uriImage);
+                    MultimediaUtilities.showGlide(uriImage, context, mediaListRowHolder.imageView);
                 }
                 Log.i(TAG, "bindTo: ");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-
-
-        private void showGlide(MediaListHolder mediaListRowHolder, DataPicture message) {
-
-            RequestOptions options = new RequestOptions()
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .format(DecodeFormat.PREFER_ARGB_8888)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
-
-            Glide.with(context)
-                    .asBitmap()
-                    .apply(options)
-                    .thumbnail(0.5f)
-                    .load(Uri.fromFile(new File(message.getFilePath())))
-                    .into(mediaListRowHolder.imageView);
         }
     }
 
@@ -339,29 +324,7 @@ public class MediaAdapterSingleAlbum extends RecyclerView.Adapter<MediaAdapterSi
     };
 
     private void addMessage(DataPicture message) {
-        if (message.getFileType().equalsIgnoreCase("video")) {
-            Log.w("A", "if");
-        }
-        int i = 0;
-        boolean exists = false;
-        for (DataPicture dataPictures : selectedMessages) {
-            if (dataPictures.getFilePath().equals(message.getFilePath())) {
-                exists = true;
-                break;
-            }
-            i = i + 1;
-        }
-        if (exists) {
-            selectedMessages.remove(i);
-        } else {
-            selectedMessages.add(message);
-        }
+        MultimediaUtilities.addMessage(message,selectedMessages);
     }
 
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
 }

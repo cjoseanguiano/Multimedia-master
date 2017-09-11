@@ -5,13 +5,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +21,7 @@ import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Model.DataPicture
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Adapter.MediaAdapterAllAlbum;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Utils.GridRecyclerView;
+import com.bsdenterprise.carlos.anguiano.multimedia.Utils.MultimediaUtilities;
 
 import java.util.ArrayList;
 
@@ -33,6 +32,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     private static final String TAG = PhotoAlbumFragment.class.getSimpleName();
     private static final String type = "images";
     private static final int REQUEST_PERMISSIONS = 100;
+    private FragmentActivity activity;
     private GridRecyclerView mRecyclerView;
     private MediaAdapterAllAlbum adapter;
     private OnMediaSelectedPhotoAlbum mCallback;
@@ -44,6 +44,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     @SuppressLint("ValidFragment")
     public PhotoAlbumFragment(boolean bacABoolean) {
         this.backPressed = bacABoolean;
+        this.activity = getActivity();
     }
 
 
@@ -58,7 +59,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
             mCallback = (OnMediaSelectedPhotoAlbum) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement ProgressBar");
+                    + " must implement PhotoAlbumFragment");
         }
     }
 
@@ -75,58 +76,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     }
 
     private void parseAllImages(String type) {
-        try {
-            int int_position = 0;
-            Uri uri;
-            Cursor cursor;
-            int column_index_data, column_index_folder_name;
-            String absolutePathOfImage;
-
-            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            String[] projection = {MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
-
-            String orderBy = MediaStore.Images.Media.DATE_TAKEN;
-            cursor = getActivity().getContentResolver().query(uri, projection, null, null, orderBy + " DESC");
-
-
-            if (cursor != null) {
-                column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-
-                while (cursor.moveToNext()) {
-
-                    absolutePathOfImage = cursor.getString(column_index_data);
-
-                    for (int i = 0; i < modelimages.size(); i++) {
-                        if (modelimages.get(i).getFolder().equals(cursor.getString(column_index_folder_name))) {
-                            boolean_folder = true;
-                            int_position = i;
-                            break;
-                        } else {
-                            boolean_folder = false;
-                        }
-                    }
-                    if (boolean_folder) {
-                        ArrayList<String> al_path = new ArrayList<>();
-                        al_path.addAll(modelimages.get(int_position).getPathSize());
-                        al_path.add(absolutePathOfImage);
-                        modelimages.get(int_position).setPathSize(al_path);
-                    } else {
-                        ArrayList<String> paths = new ArrayList<>();
-                        paths.add(absolutePathOfImage);
-                        DataPicturesAlbum mediaFileInfo = new DataPicturesAlbum();
-                        mediaFileInfo.setFolder(cursor.getString(column_index_folder_name));
-                        mediaFileInfo.setPathSize(paths);
-                        mediaFileInfo.setType(type);
-                        modelimages.add(mediaFileInfo);
-                    }
-                }
-                cursor.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        MultimediaUtilities.parseAllImages(type, (FragmentActivity) mCallback,boolean_folder,modelimages);
     }
 
     @Override

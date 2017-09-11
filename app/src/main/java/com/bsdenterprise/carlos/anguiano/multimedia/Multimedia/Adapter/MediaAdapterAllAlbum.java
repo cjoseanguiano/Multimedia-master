@@ -13,10 +13,7 @@ import android.widget.TextView;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Interface.MediaAdapterAllAlbumClickListener;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Model.DataPicturesAlbum;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DecodeFormat;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
+import com.bsdenterprise.carlos.anguiano.multimedia.Utils.MultimediaUtilities;
 
 import java.util.List;
 
@@ -34,6 +31,7 @@ public class MediaAdapterAllAlbum extends RecyclerView.Adapter<MediaAdapterAllAl
     private int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
     private boolean backPressed = false;
     private Activity context;
+    private final String file = "file://";
 
     public MediaAdapterAllAlbum(Activity context, List<DataPicturesAlbum> mediaList, boolean backPressed) {
         Log.i(TAG, "MediaAdapterAllAlbums: ");
@@ -68,7 +66,7 @@ public class MediaAdapterAllAlbum extends RecyclerView.Adapter<MediaAdapterAllAl
         return (null != itemList ? itemList.size() : 0);
     }
 
-    class MediaListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class MediaListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView picture;
         TextView albumName;
         TextView nMedia;
@@ -97,25 +95,11 @@ public class MediaAdapterAllAlbum extends RecyclerView.Adapter<MediaAdapterAllAl
             mediaListRowHolder.nMedia.setText(itemList.get(i).getPathSize().size() + "");
 
             try {
-                String uriImage = "file://" + itemList.get(i).getPathSize().get(0);
-                showGlide(uriImage, mediaListRowHolder);
+                String uriImage = file + itemList.get(i).getPathSize().get(0);
+                MultimediaUtilities.showGlide(uriImage, context, mediaListRowHolder.picture);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-
-        private void showGlide(String uriImage, MediaListHolder mediaListRowHolder) {
-            RequestOptions options = new RequestOptions()
-                    .format(DecodeFormat.PREFER_ARGB_8888)
-                    .centerCrop()
-                    .error(R.drawable.no_image)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
-
-            Glide.with(context)
-                    .load(uriImage)
-                    .apply(options)
-                    .into(mediaListRowHolder.picture);
-
         }
     }
 }

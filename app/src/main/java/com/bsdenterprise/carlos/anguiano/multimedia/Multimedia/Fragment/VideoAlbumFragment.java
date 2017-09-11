@@ -3,12 +3,10 @@ package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +17,7 @@ import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Interface.MediaAd
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Model.DataPicturesAlbum;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Utils.GridRecyclerView;
+import com.bsdenterprise.carlos.anguiano.multimedia.Utils.MultimediaUtilities;
 
 import java.util.ArrayList;
 
@@ -53,7 +52,7 @@ public class VideoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
             mCallback = (OnMediaSelectedVideoAlbum) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement ProgressBar");
+                    + " must implement VideoAlbumFragment");
         }
     }
 
@@ -70,68 +69,7 @@ public class VideoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     }
 
     private void parseAllVideo(String type) {
-        try {
-            int int_position = 0;
-            Uri uri;
-            Cursor cursor;
-            int column_index_data, column_index_folder_name;
-            String absolutePathOfImage;
-
-            uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-//            String[] projection = {MediaStore.MediaColumns.DATA, MediaStore.Video.Media.BUCKET_DISPLAY_NAME};
-            String[] projection = new String[]{MediaStore.Video.Media._ID, MediaStore.Video.Media.BUCKET_DISPLAY_NAME, MediaStore.Video.Media.DATE_TAKEN, MediaStore.Video.Media.DATA};
-            String orderBy = MediaStore.Video.Media.DATE_TAKEN;
-            cursor = getActivity().getContentResolver().query(uri, projection, null, null, orderBy + " DESC");
-
-
-            if (cursor != null) {
-                column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
-
-
-                while (cursor.moveToNext()) {
-
-                    absolutePathOfImage = cursor.getString(column_index_data);
-                    Log.i(TAG, "parseAllVideos: " + absolutePathOfImage);
-                    Log.i(TAG, "parseAllVideos: " + cursor.getString(column_index_folder_name));
-
-                    for (int i = 0; i < modelimages.size(); i++) {
-                        if (modelimages.get(i).getFolder().equals(cursor.getString(column_index_folder_name))) {
-                            boolean_folder = true;
-                            int_position = i;
-                            break;
-                        } else {
-                            boolean_folder = false;
-                        }
-                    }
-
-                    if (boolean_folder) {
-                        ArrayList<String> al_path = new ArrayList<>();
-                        al_path.addAll(modelimages.get(int_position).getPathSize());
-                        al_path.add(absolutePathOfImage);
-                        modelimages.get(int_position).setPathSize(al_path);
-                    } else {
-                        ArrayList<String> paths = new ArrayList<>();
-                        paths.add(absolutePathOfImage);
-                        DataPicturesAlbum mediaFileInfo = new DataPicturesAlbum();
-                        mediaFileInfo.setFolder(cursor.getString(column_index_folder_name));
-                        mediaFileInfo.setPathSize(paths);
-                        mediaFileInfo.setType(type);
-                        modelimages.add(mediaFileInfo);
-                    }
-                }
-                cursor.close();
-
-                for (int i = 0; i < modelimages.size(); i++) {
-                    Log.e("FOLDER", modelimages.get(i).getFolder());
-                    for (int j = 0; j < modelimages.get(i).getPathSize().size(); j++) {
-                        Log.e("FILE", modelimages.get(i).getPathSize().get(j));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        MultimediaUtilities.parseAllVideo(type, (FragmentActivity) mCallback,boolean_folder,modelimages);
     }
 
     @Override
