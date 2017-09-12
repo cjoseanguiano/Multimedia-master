@@ -2,7 +2,11 @@ package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.renderscript.Byte2;
 import android.support.design.widget.FloatingActionButton;
@@ -13,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Adapter.ViewPagerAdapter;
@@ -22,17 +27,28 @@ import com.bsdenterprise.carlos.anguiano.multimedia.Utils.MultimediaUtilities;
 import com.bsdenterprise.carlos.anguiano.multimedia.Utils.ApplicationSingleton;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity.ShowMediaFileActivity.EXTRA_RESULT_SELECTED_PICTURE;
+import static com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity.ShowMediaFileActivity.EXTRA_RESULT_SELECTED_PICTURE_PHOTO;
+
 public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlbumFragment.OnMediaSelectedPhotoAlbum, VideoAlbumFragment.OnMediaSelectedVideoAlbum {
     public static final String TAG = MainAlbumListActivity.class.getSimpleName();
 
     public static final String EXTRA_NAME = "sendUser";//Displays the user Name
     public static final String EXTRA_JID = "extra_jid";//Displays the user Jid
     public static final String EXTRA_RESULT_SELECTED_ALBUM = "selected_media_album";//Send album result
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     public static final String EXTRA_BUCKET = "extra_bucket";
     public static final String EXTRA_TYPE_ALBUM = "extra_type_album";
     private static final String BACK_PRESSED = "back_pressed";
+    private static final int REQUEST_TAKE_PHOTO = 1;
     private String body;
     private boolean backPressed = false;
     public static final String EXTRA_BACK_SELECT = "extra_back_select";
@@ -43,14 +59,14 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private FloatingActionButton floatingActionButton;
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private int mCurrentPagePosition = 1;
+    private String mCurrentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_list_multimedia);
         Log.i(TAG, "onCreate: ");
-        startView();
+        initInstances();
         label_Photo = getResources().getString(R.string.image);
         label_Video = getResources().getString(R.string.video);
 
@@ -64,7 +80,11 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
                 } else {
                     Toast.makeText(MainAlbumListActivity.this, "Select B", Toast.LENGTH_SHORT).show();
                     floatingActionButton.hide();
-                    dispatchTakePictureIntent();
+                    try {
+                        dispatchTakePictureIntent();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -118,12 +138,12 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 
     }
 
-    private void startView() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.fabAlbum);
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-
+    private void initInstances() {
+        toolbar = findViewById(R.id.toolbar);
+        floatingActionButton = findViewById(R.id.fabAlbum);
+        viewPager = findViewById(R.id.viewpager);
+        tabLayout = findViewById(R.id.tab_layout);
+//        ivPreview = findViewById(R.id.ivPreview);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -180,23 +200,60 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 
     }
 
-
-    private void dispatchTakePictureIntent() {
-        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePicture.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+    private void dispatchTakePictureIntent() throws IOException {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                return;
+            }
+            if (photoFile != null) {
+                Uri photoURI = Uri.fromFile(createImageFile());
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
         }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                storageDir
+        );
+
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (REQUEST_IMAGE_CAPTURE == 1 && resultCode == Activity.RESULT_OK) {
-            Log.i(TAG, "onActivityResult: ");
-        }
-        if (requestCode == 1 && resultCode == Activity.RESULT_CANCELED) {
-            Log.i(TAG, "onActivityResult: ");
-            floatingActionButton.show();
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            Uri imageUri = Uri.parse(mCurrentPhotoPath);
+            File file = new File(imageUri.getPath());
+            try {
+                InputStream ims = new FileInputStream(file);
+                Intent intent = new Intent(this, ShowMediaFileActivity.class);
+                intent.putExtra(EXTRA_RESULT_SELECTED_PICTURE_PHOTO, imageUri.getPath());
+                startActivity(intent);
+                this.finish();
+
+            } catch (FileNotFoundException e) {
+                return;
+            }
+            MediaScannerConnection.scanFile(MainAlbumListActivity.this,
+                    new String[]{imageUri.getPath()}, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                        }
+                    });
         }
     }
 }

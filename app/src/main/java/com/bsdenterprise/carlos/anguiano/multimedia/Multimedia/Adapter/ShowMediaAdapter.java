@@ -30,9 +30,11 @@ public class ShowMediaAdapter extends PagerAdapter {
 
     @Override
     public int getItemPosition(Object object) {
-        for (int i = 0; i < mImagePath.size(); i++) {
-            if (mImagePath.get(i).equals(object))
-                return i;
+        if (mImagePath != null) {
+            for (int i = 0; i < mImagePath.size(); i++) {
+                if (mImagePath.get(i).equals(object))
+                    return i;
+            }
         }
         return 0;
     }

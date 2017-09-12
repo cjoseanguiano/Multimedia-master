@@ -32,12 +32,16 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ShowMediaFileActivity extends AppCompatActivity {
 
     public static final String TAG = ShowMediaFileActivity.class.getSimpleName();
     public static final String EXTRA_RESULT_SELECTED_PICTURE = "extra_result_selected_picture";
+    public static final String EXTRA_RESULT_SELECTED_PICTURE_PHOTO = "extra_result_selected_picture_photo";
     public static final String EXTRA_RESULT_SELECTED_VIDEO = "extra_result_selected_video";
     private static final String EXTRA_TYPE_BUCKET = "extra_type_bucket";
     private static final String EXTRA_TYPE_FILE = "extra_type_file";
@@ -60,12 +64,14 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     private LinearLayout thumbnailsContainer;
     private Toolbar toolbar;
     private StringBuilder stringBuilder = new StringBuilder();
+    private Uri mImagePathPhoto;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_multimedia);
-        startView();
+        initInstances();
         setUpToolbar();
         showIntent();
         inflateThumbnails(mImagePath);
@@ -91,12 +97,14 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     }
 
     private void checkImage() {
-        for (int i = 0; i < mImagePath.size(); i++) {
-            stringBuilder.append(mImagePath.get(i));
-        }
-        newPath = stringBuilder.toString();
-        if (newPath.contains(".jpg") || (newPath.contains(".png")) || (newPath.contains(".jpeg"))) {
-            createViewPager();
+        if (mImagePath != null) {
+            for (int i = 0; i < mImagePath.size(); i++) {
+                stringBuilder.append(mImagePath.get(i));
+            }
+            newPath = stringBuilder.toString();
+            if (newPath.contains(".jpg") || (newPath.contains(".png")) || (newPath.contains(".jpeg"))) {
+                createViewPager();
+            }
         }
     }
 
@@ -104,7 +112,8 @@ public class ShowMediaFileActivity extends AppCompatActivity {
         if (bundle != null) {
             if (getIntent().hasExtra(EXTRA_RESULT_SELECTED_PICTURE)) {
                 mImagePath = bundle.getStringArrayList(EXTRA_RESULT_SELECTED_PICTURE);
-            } else if (getIntent().hasExtra(EXTRA_RESULT_SELECTED_VIDEO)) {
+            }
+            if (getIntent().hasExtra(EXTRA_RESULT_SELECTED_VIDEO)) {
                 iconRemove = true;
                 addPicture.setVisibility(View.INVISIBLE);
                 mImagePath = bundle.getStringArrayList(EXTRA_RESULT_SELECTED_VIDEO);
@@ -119,18 +128,35 @@ public class ShowMediaFileActivity extends AppCompatActivity {
                 inflateThumbnails(mImagePath);
                 imageView.setImageBitmap(bmThumbnail);
             }
-        }
-        adapter = new ShowMediaAdapter(this, mImagePath);
 
+            if (getIntent().hasExtra(EXTRA_RESULT_SELECTED_PICTURE_PHOTO)) {
+                Log.i(TAG, "checkBundle: ");
+                addPicture.setVisibility(View.GONE);
+                iconRemove = true;
+                mImagePathPhoto = Uri.parse(bundle.getString(EXTRA_RESULT_SELECTED_PICTURE_PHOTO));
+                Uri imageUri = Uri.parse(mImagePathPhoto.toString());
+                File file = new File(imageUri.getPath());
+                try {
+                    InputStream ims = new FileInputStream(file.getPath());
+                    createImageViewNew();
+                    imageView.setImageBitmap(BitmapFactory.decodeStream(ims));
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            adapter = new ShowMediaAdapter(this, mImagePath);
+        }
     }
 
-    private void startView() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        thumbnailsContainer = (LinearLayout) findViewById(R.id.container);
-        addPicture = (ImageView) findViewById(R.id.imageView5);
-        send = (FloatingActionButton) findViewById(R.id.fab);
-        photoDescription = (EditText) findViewById(R.id.photoDescription);
-        send = (FloatingActionButton) findViewById(R.id.fab);
+    private void initInstances() {
+        toolbar = findViewById(R.id.toolbar);
+        thumbnailsContainer = findViewById(R.id.container);
+        addPicture = findViewById(R.id.imageView5);
+        send = findViewById(R.id.fab);
+        photoDescription = findViewById(R.id.photoDescription);
+        send = findViewById(R.id.fab);
 
     }
 
@@ -141,9 +167,8 @@ public class ShowMediaFileActivity extends AppCompatActivity {
         typeFile = getIntent().getStringExtra(EXTRA_TYPE_FILE);
     }
 
-
     public void createImageViewNew() {
-        FrameLayout frameLayoutV = (FrameLayout) findViewById(R.id.fragmentContainer);
+        FrameLayout frameLayoutV = findViewById(R.id.fragmentContainer);
         imageView = new ImageView(this);
         CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.MATCH_PARENT);
         imageView.setId(R.id.viewImageMultimedia);
@@ -168,7 +193,6 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     }
 
     private void addPicture() {
-//        Intent intent = new Intent(this, MainSingleAlbums.class);
         Intent intent = new Intent(this, MainSingleAlbumActivity.class);
         intent.putStringArrayListExtra(EXTRA_RESULT_SELECTED_PICTURE, mImagePath);
         intent.putExtra(EXTRA_TYPE_BUCKET, typeBucket);
@@ -271,7 +295,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     }
 
     public void createViewPager() {
-        FrameLayout frameLayoutI = (FrameLayout) findViewById(R.id.fragmentContainer);
+        FrameLayout frameLayoutI = findViewById(R.id.fragmentContainer);
         viewPager = new ViewPager(this);
         CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.MATCH_PARENT);
         viewPager.setId(R.id.viewPagerMultimedia);

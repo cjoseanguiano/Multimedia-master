@@ -12,16 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-      <!--  <android.support.v4.view.ViewPager
-            android:id="@+id/viewpagerMedia"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>   -->
-
         <VideoView
             android:id="@+id/videoViewx"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"/>
+
     </FrameLayout>
 
 
