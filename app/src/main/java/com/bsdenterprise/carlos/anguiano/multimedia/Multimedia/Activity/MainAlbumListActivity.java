@@ -90,30 +90,6 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 
         setupViewPager(viewPager);
         tabLayout.setupWithViewPager(viewPager);
-
-//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//                Log.i(TAG, "onPageScrolled: ");
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//                Log.i(TAG, "onPageSelected: ");
-//                if (position == 0) {
-//                    floatingActionButton.setImageResource(R.drawable.ic_add_a_photo);
-//                } else {
-//                    floatingActionButton.setImageResource(R.drawable.ic_videocam);
-//                }
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//                Log.i(TAG, "onPageScrollStateChanged: ");
-//            }
-//        });
-
-
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
             @Override
@@ -215,5 +191,12 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (REQUEST_IMAGE_CAPTURE == 1 && resultCode == Activity.RESULT_OK) {
+            Log.i(TAG, "onActivityResult: ");
+        }
+        if (requestCode == 1 && resultCode == Activity.RESULT_CANCELED) {
+            Log.i(TAG, "onActivityResult: ");
+            floatingActionButton.show();
+        }
     }
 }
