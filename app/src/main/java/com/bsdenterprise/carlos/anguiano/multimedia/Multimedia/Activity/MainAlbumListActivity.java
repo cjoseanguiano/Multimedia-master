@@ -59,7 +59,8 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private FloatingActionButton floatingActionButton;
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private String mCurrentPhotoPath;
+//    private String mCurrentPhotoPath;
+    private Uri photoURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +144,6 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         floatingActionButton = findViewById(R.id.fabAlbum);
         viewPager = findViewById(R.id.viewpager);
         tabLayout = findViewById(R.id.tab_layout);
-//        ivPreview = findViewById(R.id.ivPreview);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -205,49 +205,29 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = MultimediaUtilities.createImageFile();
             } catch (IOException ex) {
                 return;
             }
             if (photoFile != null) {
-                Uri photoURI = Uri.fromFile(createImageFile());
+                photoURI = Uri.fromFile(MultimediaUtilities.createImageFile());
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
     }
 
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM), "Camera");
-        File image = File.createTempFile(
-                imageFileName,
-                ".jpg",
-                storageDir
-        );
-
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return image;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            Uri imageUri = Uri.parse(mCurrentPhotoPath);
-            File file = new File(imageUri.getPath());
-            try {
-                InputStream ims = new FileInputStream(file);
-                Intent intent = new Intent(this, ShowMediaFileActivity.class);
-                intent.putExtra(EXTRA_RESULT_SELECTED_PICTURE_PHOTO, imageUri.getPath());
-                startActivity(intent);
-                this.finish();
 
-            } catch (FileNotFoundException e) {
-                return;
-            }
+            Uri imageUri = Uri.parse(photoURI.toString());
+            Intent intent = new Intent(this, ShowMediaFileActivity.class);
+            intent.putExtra(EXTRA_RESULT_SELECTED_PICTURE_PHOTO, imageUri.getPath());
+            startActivity(intent);
+            this.finish();
+
             MediaScannerConnection.scanFile(MainAlbumListActivity.this,
                     new String[]{imageUri.getPath()}, null,
                     new MediaScannerConnection.OnScanCompletedListener() {

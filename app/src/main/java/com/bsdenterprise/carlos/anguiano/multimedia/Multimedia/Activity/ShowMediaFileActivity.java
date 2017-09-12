@@ -51,7 +51,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     private ShowMediaAdapter adapter;
     private ArrayList<String> mImagePath = new ArrayList<>();
     private ImageView imageView;
-    boolean iconRemove = false;
+    private boolean iconRemove = false;
     private String newPath;
     private ImageView addPicture;
     private Bundle bundle;
@@ -269,8 +269,8 @@ public class ShowMediaFileActivity extends AppCompatActivity {
             chatMessage[0] = adapter.getItemPosition(currentPage);
             position = viewPager.getCurrentItem();
 
-            String a = adapter.getCurrentItem(position);
-            CropImage.activity(Uri.fromFile(new File(a)))
+            String pos = adapter.getCurrentItem(position);
+            CropImage.activity(Uri.fromFile(new File(pos)))
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .start(this);
             return true;
@@ -330,7 +330,6 @@ public class ShowMediaFileActivity extends AppCompatActivity {
                 thumbnailsContainer.addView(imageLayout);
             }
         }
-
     }
 
     private View.OnClickListener onChagePageClickListener(final int i) {
