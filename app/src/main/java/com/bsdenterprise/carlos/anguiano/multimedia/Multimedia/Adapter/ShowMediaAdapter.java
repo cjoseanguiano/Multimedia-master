@@ -78,7 +78,7 @@ public class ShowMediaAdapter extends PagerAdapter {
         } else {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
             alertDialog.setTitle("Error de Imagen");
-            alertDialog.setMessage("Virifica que la imagen exista dentro de la tarjeta SD");
+            alertDialog.setMessage("Verifica que la imagen exista dentro de la tarjeta SD");
             alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {

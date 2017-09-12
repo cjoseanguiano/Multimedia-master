@@ -26,10 +26,10 @@ import static com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Activity.
 public class HomeActivity extends AppCompatActivity {
     private static final String TAG = HomeActivity.class.getSimpleName();
 
-    private static final int RESULT_LOAD_IMAGE_MULTIMEDIA = 90;
-    private static final int RESULT_MAIN_SINGLE_ALBUM_MULTIMEDIA = 91;
-    private static final int RESULT_IMAGE_SELECTED_MULTIMEDIA = 92;
-    private static final int RESULT_VIDEO_SELECTED_MULTIMEDIA = 93;
+    private static final int RESULT_LOAD_IMAGE_MULTIMEDIA = 80;
+    private static final int RESULT_MAIN_SINGLE_ALBUM_MULTIMEDIA = 81;
+    private static final int RESULT_IMAGE_SELECTED_MULTIMEDIA = 82;
+    private static final int RESULT_VIDEO_SELECTED_MULTIMEDIA = 83;
 
 
     private Button button;
@@ -41,7 +41,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_multimedia);
 
-        button = (Button) findViewById(R.id.buttonHome);
+        button = findViewById(R.id.buttonHome);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

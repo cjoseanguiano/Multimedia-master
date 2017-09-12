@@ -2,13 +2,10 @@ package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.renderscript.Byte2;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -17,26 +14,19 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Adapter.ViewPagerAdapter;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment.PhotoAlbumFragment;
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment.VideoAlbumFragment;
-import com.bsdenterprise.carlos.anguiano.multimedia.Utils.MultimediaUtilities;
-import com.bsdenterprise.carlos.anguiano.multimedia.Utils.ApplicationSingleton;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
+import com.bsdenterprise.carlos.anguiano.multimedia.Utils.ApplicationSingleton;
+import com.bsdenterprise.carlos.anguiano.multimedia.Utils.MultimediaUtilities;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import static com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity.ShowMediaFileActivity.EXTRA_RESULT_SELECTED_PICTURE;
-import static com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity.ShowMediaFileActivity.EXTRA_RESULT_SELECTED_PICTURE_PHOTO;
+import static com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity.ShowMediaFileActivity.CAPTURE_PHOTO;
 
 public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlbumFragment.OnMediaSelectedPhotoAlbum, VideoAlbumFragment.OnMediaSelectedVideoAlbum {
     public static final String TAG = MainAlbumListActivity.class.getSimpleName();
@@ -48,7 +38,8 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     public static final String EXTRA_BUCKET = "extra_bucket";
     public static final String EXTRA_TYPE_ALBUM = "extra_type_album";
     private static final String BACK_PRESSED = "back_pressed";
-    private static final int REQUEST_TAKE_PHOTO = 1;
+    private static final int REQUEST_TAKE_PHOTO = 84;
+    private static final int REQUEST_TAKE_VIDEO = 85;
     private String body;
     private boolean backPressed = false;
     public static final String EXTRA_BACK_SELECT = "extra_back_select";
@@ -59,7 +50,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private FloatingActionButton floatingActionButton;
     private ViewPager viewPager;
     private TabLayout tabLayout;
-//    private String mCurrentPhotoPath;
+    //    private String mCurrentPhotoPath;
     private Uri photoURI;
 
     @Override
@@ -77,6 +68,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
                 if (tabLayout.getSelectedTabPosition() == 1) {
                     Toast.makeText(MainAlbumListActivity.this, "Select A", Toast.LENGTH_SHORT).show();
                     floatingActionButton.hide();
+                    dispatchTakeVideoIntent();
 
                 } else {
                     Toast.makeText(MainAlbumListActivity.this, "Select B", Toast.LENGTH_SHORT).show();
@@ -203,7 +195,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private void dispatchTakePictureIntent() throws IOException {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
+            File photoFile;
             try {
                 photoFile = MultimediaUtilities.createImageFile();
             } catch (IOException ex) {
@@ -217,6 +209,27 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         }
     }
 
+
+    private void dispatchTakeVideoIntent() {
+        Log.i(TAG, "dispatchTakeVideoIntent: ");
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+
+        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile;
+            try {
+                photoFile = MultimediaUtilities.createImageFile();
+            } catch (IOException ex) {
+                return;
+            }
+            if (photoFile != null) {
+//                photoURI = Uri.fromFile(MultimediaUtilities.createVideoFile());
+                takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takeVideoIntent, REQUEST_TAKE_VIDEO);
+            }
+        }
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -224,7 +237,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 
             Uri imageUri = Uri.parse(photoURI.toString());
             Intent intent = new Intent(this, ShowMediaFileActivity.class);
-            intent.putExtra(EXTRA_RESULT_SELECTED_PICTURE_PHOTO, imageUri.getPath());
+            intent.putExtra(CAPTURE_PHOTO, imageUri.getPath());
             startActivity(intent);
             this.finish();
 
@@ -234,6 +247,13 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
                         public void onScanCompleted(String path, Uri uri) {
                         }
                     });
+        }
+        if (requestCode == REQUEST_TAKE_VIDEO && resultCode == RESULT_OK) {
+            Log.i(TAG, "onActivityResult: ");
+        }
+
+        if ((requestCode == REQUEST_TAKE_PHOTO || requestCode == REQUEST_TAKE_VIDEO) && resultCode == Activity.RESULT_CANCELED) {
+            floatingActionButton.show();
         }
     }
 }

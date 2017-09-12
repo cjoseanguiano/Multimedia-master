@@ -41,7 +41,8 @@ public class ShowMediaFileActivity extends AppCompatActivity {
 
     public static final String TAG = ShowMediaFileActivity.class.getSimpleName();
     public static final String EXTRA_RESULT_SELECTED_PICTURE = "extra_result_selected_picture";
-    public static final String EXTRA_RESULT_SELECTED_PICTURE_PHOTO = "extra_result_selected_picture_photo";
+    public static final String CAPTURE_PHOTO = "capture_photo";
+    public static final String CAPTURE_VIDEO = "capture_video";
     public static final String EXTRA_RESULT_SELECTED_VIDEO = "extra_result_selected_video";
     private static final String EXTRA_TYPE_BUCKET = "extra_type_bucket";
     private static final String EXTRA_TYPE_FILE = "extra_type_file";
@@ -129,11 +130,11 @@ public class ShowMediaFileActivity extends AppCompatActivity {
                 imageView.setImageBitmap(bmThumbnail);
             }
 
-            if (getIntent().hasExtra(EXTRA_RESULT_SELECTED_PICTURE_PHOTO)) {
+            if (getIntent().hasExtra(CAPTURE_PHOTO)) {
                 Log.i(TAG, "checkBundle: ");
                 addPicture.setVisibility(View.GONE);
                 iconRemove = true;
-                mImagePathPhoto = Uri.parse(bundle.getString(EXTRA_RESULT_SELECTED_PICTURE_PHOTO));
+                mImagePathPhoto = Uri.parse(bundle.getString(CAPTURE_PHOTO));
                 Uri imageUri = Uri.parse(mImagePathPhoto.toString());
                 File file = new File(imageUri.getPath());
                 try {

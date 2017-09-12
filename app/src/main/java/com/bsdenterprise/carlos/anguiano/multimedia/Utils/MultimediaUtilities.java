@@ -214,8 +214,8 @@ public class MultimediaUtilities {
 
 
     public static File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String timeStampPhoto = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStampPhoto + "_";
         File storageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DCIM), "Camera");
         File image = File.createTempFile(
@@ -227,4 +227,11 @@ public class MultimediaUtilities {
         String mCurrentPhotoPath = "file:" + image.getAbsolutePath();
         return image;
     }
+/*
+    public static File createVideoFile() {
+        String timeStampVideo = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String videoFineName = "MP4_" + timeStampVideo + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),"Camera");
+        File video = File.
+    }*/
 }
