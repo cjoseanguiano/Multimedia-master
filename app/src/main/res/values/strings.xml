@@ -17,5 +17,7 @@
     <string name="sendPhoto">Enviar Fotografias</string>
     <string name="sendVideo">Enviar Video</string>
     <string name="about">Acerca de</string>
+    <string name="permission_camera_rationale">Camera permission is needed to show the camera preview.</string>
+    <string name="ok">Ok</string>
 
 </resources>

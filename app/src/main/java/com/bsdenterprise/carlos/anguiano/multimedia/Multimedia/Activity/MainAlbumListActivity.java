@@ -1,13 +1,17 @@
 package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -40,6 +44,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private static final String BACK_PRESSED = "back_pressed";
     private static final int REQUEST_TAKE_PHOTO = 84;
     private static final int REQUEST_TAKE_VIDEO = 85;
+    private static final int REQUEST_CAMERA = 0;
     private String body;
     private boolean backPressed = false;
     public static final String EXTRA_BACK_SELECT = "extra_back_select";
@@ -68,7 +73,11 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
                 if (tabLayout.getSelectedTabPosition() == 1) {
                     Toast.makeText(MainAlbumListActivity.this, "Select A", Toast.LENGTH_SHORT).show();
                     floatingActionButton.hide();
-                    dispatchTakeVideoIntent();
+                    try {
+                        dispatchTakeVideoIntent();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                 } else {
                     Toast.makeText(MainAlbumListActivity.this, "Select B", Toast.LENGTH_SHORT).show();
@@ -130,6 +139,54 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         });
 
     }
+
+//    public void showCamera() {
+//        Log.i(TAG, "Show camera button pressed. Checking permission.");
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            requestCameraPermission();
+//
+//        } else {
+//            Log.i(TAG, "CAMERA permission has already been granted. Displaying camera preview.");
+//            try {
+//                dispatchTakePictureIntent();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+    private void requestCameraPermission() {
+        Log.i(TAG, "CAMERA permission has NOT been granted. Requesting permission.");
+
+        // BEGIN_INCLUDE(camera_permission_request)
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CAMERA)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            Log.i(TAG,
+                    "Displaying camera permission rationale to provide additional context.");
+            Snackbar.make(viewPager, R.string.permission_camera_rationale,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(MainAlbumListActivity.this,
+                                    new String[]{Manifest.permission.CAMERA},
+                                    REQUEST_CAMERA);
+                        }
+                    })
+                    .show();
+        } else {
+
+            // Camera permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                    REQUEST_CAMERA);
+        }
+        // END_INCLUDE(camera_permission_request)
+    }
+
 
     private void initInstances() {
         toolbar = findViewById(R.id.toolbar);
@@ -210,19 +267,19 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     }
 
 
-    private void dispatchTakeVideoIntent() {
+    private void dispatchTakeVideoIntent() throws IOException {
         Log.i(TAG, "dispatchTakeVideoIntent: ");
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
         if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile;
             try {
-                photoFile = MultimediaUtilities.createImageFile();
+                photoFile = MultimediaUtilities.createVideoFile();
             } catch (IOException ex) {
                 return;
             }
             if (photoFile != null) {
-//                photoURI = Uri.fromFile(MultimediaUtilities.createVideoFile());
+                photoURI = Uri.fromFile(MultimediaUtilities.createVideoFile());
                 takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takeVideoIntent, REQUEST_TAKE_VIDEO);
             }

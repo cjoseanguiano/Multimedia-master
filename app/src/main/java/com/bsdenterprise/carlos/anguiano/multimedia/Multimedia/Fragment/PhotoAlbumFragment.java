@@ -39,7 +39,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     private View view = null;
     private boolean boolean_folder;
     private boolean backPressed = false;
-    public static ArrayList<DataPicturesAlbum> modelimages = new ArrayList<>();
+    public static ArrayList<DataPicturesAlbum> modelImages = new ArrayList<>();
 
     @SuppressLint("ValidFragment")
     public PhotoAlbumFragment(boolean bacABoolean) {
@@ -76,7 +76,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     }
 
     private void parseAllImages(String type) {
-        MultimediaUtilities.parseAllImages(type, (FragmentActivity) mCallback,boolean_folder,modelimages);
+        MultimediaUtilities.parseAllImages(type, (FragmentActivity) mCallback,boolean_folder, modelImages);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
             Integer result = 0;
             String type = params[0];
             try {
-                modelimages = new ArrayList<>();
+                modelImages = new ArrayList<>();
                 if (type.equalsIgnoreCase("images")) {
                     parseAllImages(type);
                     result = 1;
@@ -146,7 +146,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
         protected void onPostExecute(Integer result) {
             if (result == 1) {
 
-                adapter = new MediaAdapterAllAlbum(getActivity(), modelimages, backPressed);
+                adapter = new MediaAdapterAllAlbum(getActivity(), modelImages, backPressed);
                 mRecyclerView.setAdapter(adapter);
                 adapter.subscribe(PhotoAlbumFragment.this);
                 view.findViewById(R.id.xpxrogressBar).setVisibility(View.GONE);

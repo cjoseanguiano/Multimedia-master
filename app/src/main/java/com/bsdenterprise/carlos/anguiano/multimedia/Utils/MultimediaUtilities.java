@@ -213,7 +213,7 @@ public class MultimediaUtilities {
     }
 
 
-    public static File createImageFile() throws IOException {
+/*    public static File createImageFilex() throws IOException {
         String timeStampPhoto = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStampPhoto + "_";
         File storageDir = new File(Environment.getExternalStoragePublicDirectory(
@@ -226,12 +226,35 @@ public class MultimediaUtilities {
 
         String mCurrentPhotoPath = "file:" + image.getAbsolutePath();
         return image;
-    }
-/*
-    public static File createVideoFile() {
-        String timeStampVideo = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String videoFineName = "MP4_" + timeStampVideo + "_";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),"Camera");
-        File video = File.
     }*/
+
+    public static File createImageFile() throws IOException {
+        String timeStampPhoto = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "C_" + timeStampPhoto + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera-Multimedia");
+
+
+        if (storageDir != null && !storageDir.exists()) {
+            if (!storageDir.mkdirs()) {
+                Log.d(TAG, "failed to create directory");
+                return null;
+            }
+        }
+        return new File(storageDir + File.separator + imageFileName + ".jpg");
+    }
+
+    public static File createVideoFile() throws IOException {
+        String timeStampPhoto = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "V_" + timeStampPhoto + "_";
+
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Video-Multimedia");
+        if (storageDir != null && !storageDir.exists()) {
+            if (!storageDir.mkdirs()) {
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+        return new File(storageDir + File.separator + imageFileName + ".mp4");
+    }
+
 }
