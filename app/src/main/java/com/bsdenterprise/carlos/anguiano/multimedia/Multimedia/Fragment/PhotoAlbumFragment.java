@@ -32,7 +32,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     private static final String TAG = PhotoAlbumFragment.class.getSimpleName();
     private static final String type = "images";
     private static final int REQUEST_PERMISSIONS = 100;
-    private FragmentActivity activity;
+//    private FragmentActivity activity;
     private GridRecyclerView mRecyclerView;
     private MediaAdapterAllAlbum adapter;
     private OnMediaSelectedPhotoAlbum mCallback;
@@ -44,7 +44,7 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     @SuppressLint("ValidFragment")
     public PhotoAlbumFragment(boolean bacABoolean) {
         this.backPressed = bacABoolean;
-        this.activity = getActivity();
+//        this.activity = getActivity();
     }
 
 

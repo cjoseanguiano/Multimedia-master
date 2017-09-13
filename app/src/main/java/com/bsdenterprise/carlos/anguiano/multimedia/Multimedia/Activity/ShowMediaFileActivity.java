@@ -75,7 +75,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
         initInstances();
         setUpToolbar();
         showIntent();
-        inflateThumbnails(mImagePath);
+//        inflateThumbnails(mImagePath);
         checkBundle(bundle);
         disableEditText(photoDescription);
         checkImage();
@@ -113,6 +113,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
         if (bundle != null) {
             if (getIntent().hasExtra(EXTRA_RESULT_SELECTED_PICTURE)) {
                 mImagePath = bundle.getStringArrayList(EXTRA_RESULT_SELECTED_PICTURE);
+                inflateThumbnails(mImagePath);
             }
             if (getIntent().hasExtra(EXTRA_RESULT_SELECTED_VIDEO)) {
                 iconRemove = true;
@@ -126,7 +127,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
                 Bitmap bmThumbnail = ThumbnailUtils.extractThumbnail(ThumbnailUtils.createVideoThumbnail(newPath,
                         MediaStore.Video.Thumbnails.MINI_KIND), 200, 200);
                 createImageViewNew();
-                inflateThumbnails(mImagePath);
+//                inflateThumbnails(mImagePath);
                 imageView.setImageBitmap(bmThumbnail);
             }
 
