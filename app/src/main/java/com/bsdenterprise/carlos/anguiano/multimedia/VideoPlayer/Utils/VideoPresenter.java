@@ -1,5 +1,6 @@
 package com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Utils;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Interface.IVideo;
@@ -28,6 +29,14 @@ public class VideoPresenter implements IVideo.Presenter {
         Log.i(TAG, "checkIntentP: ");
         if (view != null) {
             model.checkIntentM(path);
+        }
+    }
+
+    @Override
+    public void checkIntentVideoCapture(Uri mImagePathVideo) {
+        Log.i(TAG, "checkIntentVideoCapture: ");
+        if (view != null) {
+            model.checkIntentUri(mImagePathVideo);
         }
     }
 
@@ -94,5 +103,6 @@ public class VideoPresenter implements IVideo.Presenter {
         // Envia el valor convertido del Array en string
         view.getValueOfString(videoPathString);
     }
+
 }
 

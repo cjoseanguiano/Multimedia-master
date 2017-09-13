@@ -33,6 +33,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements IVideo.Vie
     private static final String TAG = VideoPlayerActivity.class.getSimpleName();
     public static final String EXTRA_MEDIA_PATHS_VIDEO = "extra_media_paths_video";
     public static final String EXTRA_NAME = "sendUser";
+    public static final String CAPTURE_VIDEO = "capture_video";
+
     private IVideo.Presenter presenter;
     private Bundle bundle;
     private SurfaceView videoSurface;
@@ -44,6 +46,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements IVideo.Vie
     private String videoPathString;
     private VideoControllerView controller;
     private boolean activateAlert = false;
+    private Uri mImagePathVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +56,13 @@ public class VideoPlayerActivity extends AppCompatActivity implements IVideo.Vie
         initView();
         initVariable();
         setupToolbar();
-        checkIntent(getIntent().hasExtra(EXTRA_MEDIA_PATHS_VIDEO));
+        if (getIntent().hasExtra(EXTRA_MEDIA_PATHS_VIDEO)) {
+            checkIntent(getIntent().hasExtra(EXTRA_MEDIA_PATHS_VIDEO));
+        }
+        if (getIntent().hasExtra(CAPTURE_VIDEO)) {
+            intentVideoCapture(getIntent().hasExtra(CAPTURE_VIDEO));
+        }
+
     }
 
 
@@ -105,8 +114,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements IVideo.Vie
 
     private void initView() {
         Log.i(TAG, "initView: ");
-        videoSurface = (SurfaceView) findViewById(R.id.videoSurface);
-        toolbar = (Toolbar) findViewById(R.id.toolbarVideo);
+        videoSurface = findViewById(R.id.videoSurface);
+        toolbar = findViewById(R.id.toolbarVideo);
     }
 
     private void initVariable() {
@@ -126,6 +135,15 @@ public class VideoPlayerActivity extends AppCompatActivity implements IVideo.Vie
             presenter.checkIntentP(bundle.getStringArrayList(EXTRA_MEDIA_PATHS_VIDEO));
         } else {
             //Si el intent no contiene nada mostrar error (AlertDialog)
+            presenter.checkIntentFailed();
+        }
+    }
+
+    private void intentVideoCapture(boolean b) {
+        if (b) {
+            mImagePathVideo = Uri.parse(bundle.getString(CAPTURE_VIDEO));
+            presenter.checkIntentVideoCapture(mImagePathVideo);
+        } else {
             presenter.checkIntentFailed();
         }
     }
@@ -318,6 +336,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements IVideo.Vie
             return super.onOptionsItemSelected(item);
         }
     }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.i(TAG, "onTouchEvent: ");

@@ -1,5 +1,7 @@
 package com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Interface;
 
+import android.net.Uri;
+
 import java.util.ArrayList;
 
 /**
@@ -30,6 +32,8 @@ public interface IVideo {
         void showErrorPath();
 
         void convertArrayList(ArrayList<String> mImagePath);
+
+        void checkIntentUri(Uri mImagePathVideo);
     }
 
     interface Presenter {
@@ -51,5 +55,8 @@ public interface IVideo {
         void addDataArray(ArrayList<String> mImagePath);
 
         void sendValueOfString(String videoPathString);
+
+        void checkIntentVideoCapture(Uri mImagePathVideo);
+
     }
 }

@@ -1,5 +1,6 @@
 package com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Model;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Interface.IVideo;
@@ -30,6 +31,19 @@ public class VideoModel implements IVideo.Model {
     }
 
     @Override
+    public void checkIntentUri(Uri mImagePathVideo) {
+        //Todo Checar uri que llegue  a VideoPlayerActivy
+        ArrayList<String> arrayList = new ArrayList<>();
+        if (mImagePathVideo != null) {
+            Uri path = Uri.parse(mImagePathVideo.toString());
+            arrayList.add(path.getPath());
+            presenter.validPath(arrayList);
+        } else {
+            presenter.invalidPathError("Error de Path");
+        }
+    }
+
+    @Override
     public void sendNameOfToolbar(String string) {
         //Enviar el dato a mostrar al toolbar
         presenter.sendDataToolbar(string);
@@ -52,4 +66,5 @@ public class VideoModel implements IVideo.Model {
         String videoPathString = stringBuilder.toString();
         presenter.sendValueOfString(videoPathString);
     }
+
 }

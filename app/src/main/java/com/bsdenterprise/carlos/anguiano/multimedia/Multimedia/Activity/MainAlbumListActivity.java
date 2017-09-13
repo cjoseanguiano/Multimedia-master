@@ -3,7 +3,6 @@ package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,11 +25,13 @@ import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Fragment.VideoAlb
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
 import com.bsdenterprise.carlos.anguiano.multimedia.Utils.ApplicationSingleton;
 import com.bsdenterprise.carlos.anguiano.multimedia.Utils.MultimediaUtilities;
+import com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Activity.VideoPlayerActivity;
 
 import java.io.File;
 import java.io.IOException;
 
 import static com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity.ShowMediaFileActivity.CAPTURE_PHOTO;
+import static com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Activity.VideoPlayerActivity.CAPTURE_VIDEO;
 
 public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlbumFragment.OnMediaSelectedPhotoAlbum, VideoAlbumFragment.OnMediaSelectedVideoAlbum {
     public static final String TAG = MainAlbumListActivity.class.getSimpleName();
@@ -44,6 +45,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private static final String BACK_PRESSED = "back_pressed";
     private static final int REQUEST_TAKE_PHOTO = 84;
     private static final int REQUEST_TAKE_VIDEO = 85;
+    private static final int EXTRA_TAKE_VIDEO = 86;
     private static final int REQUEST_CAMERA = 0;
     private String body;
     private boolean backPressed = false;
@@ -71,7 +73,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
             @Override
             public void onClick(View view) {
                 if (tabLayout.getSelectedTabPosition() == 1) {
-                    Toast.makeText(MainAlbumListActivity.this, "Select A", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainAlbumListActivity.this, "Select Video", Toast.LENGTH_SHORT).show();
                     floatingActionButton.hide();
                     try {
                         dispatchTakeVideoIntent();
@@ -80,7 +82,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
                     }
 
                 } else {
-                    Toast.makeText(MainAlbumListActivity.this, "Select B", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainAlbumListActivity.this, "Select Camera", Toast.LENGTH_SHORT).show();
                     floatingActionButton.hide();
                     try {
                         dispatchTakePictureIntent();
@@ -307,8 +309,28 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         }
         if (requestCode == REQUEST_TAKE_VIDEO && resultCode == RESULT_OK) {
             Log.i(TAG, "onActivityResult: ");
-        }
+            Uri imageUri = Uri.parse(photoURI.toString());
+            Intent videoPlayer = new Intent(this, VideoPlayerActivity.class);
+            videoPlayer.putExtra(CAPTURE_VIDEO, imageUri.getPath());
+            startActivityForResult(videoPlayer, EXTRA_TAKE_VIDEO);
 
+//            startActivity(videoPlayer);
+//            this.finish();
+        }
+        if (requestCode == EXTRA_TAKE_VIDEO && resultCode == RESULT_OK){
+            Uri imageUri = Uri.parse(photoURI.toString());
+            Intent intent = new Intent(this, ShowMediaFileActivity.class);
+            intent.putExtra(CAPTURE_PHOTO, imageUri.getPath());
+            startActivity(intent);
+            this.finish();
+
+            MediaScannerConnection.scanFile(MainAlbumListActivity.this,
+                    new String[]{imageUri.getPath()}, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                        }
+                    });
+        }
         if ((requestCode == REQUEST_TAKE_PHOTO || requestCode == REQUEST_TAKE_VIDEO) && resultCode == Activity.RESULT_CANCELED) {
             floatingActionButton.show();
         }
