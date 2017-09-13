@@ -29,6 +29,7 @@ import com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Activity.VideoPl
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity.ShowMediaFileActivity.CAPTURE_PHOTO;
 import static com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Activity.VideoPlayerActivity.CAPTURE_VIDEO;
@@ -317,13 +318,21 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 //            startActivity(videoPlayer);
 //            this.finish();
         }
-        if (requestCode == EXTRA_TAKE_VIDEO && resultCode == RESULT_OK){
+        if (requestCode == EXTRA_TAKE_VIDEO && resultCode == RESULT_OK) {
             Uri imageUri = Uri.parse(photoURI.toString());
+            ArrayList<String> pathVideo = new ArrayList<>();
+            if (imageUri != null) {
+                pathVideo.add(imageUri.getPath());
+            }
             Intent intent = new Intent(this, ShowMediaFileActivity.class);
-            intent.putExtra(CAPTURE_PHOTO, imageUri.getPath());
+            intent.putExtra(ShowMediaFileActivity.EXTRA_RESULT_SELECTED_VIDEO, pathVideo);
             startActivity(intent);
             this.finish();
 
+            /*i.putExtra(ShowMediaFileActivity.EXTRA_RESULT_SELECTED_VIDEO, mImagePaths);
+                        i.putExtra(EXTRA_TYPE_BUCKET, data.getStringExtra(EXTRA_TYPE_BUCKET));
+                        i.putExtra(EXTRA_TYPE_FILE, data.getStringExtra(EXTRA_TYPE_FILE));
+                        startActivityForResult(i, RESULT_VIDEO_SELECTED_MULTIMEDIA);*/
             MediaScannerConnection.scanFile(MainAlbumListActivity.this,
                     new String[]{imageUri.getPath()}, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
