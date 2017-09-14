@@ -41,10 +41,17 @@ public class PhotoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     private boolean backPressed = false;
     public static ArrayList<DataPicturesAlbum> modelImages = new ArrayList<>();
 
-    @SuppressLint("ValidFragment")
-    public PhotoAlbumFragment(boolean bacABoolean) {
-        this.backPressed = bacABoolean;
-//        this.activity = getActivity();
+//    @SuppressLint("ValidFragment")
+//    public PhotoAlbumFragment(boolean bacABoolean) {
+//        this.backPressed = bacABoolean;
+////        this.activity = getActivity();
+//    }
+    public static PhotoAlbumFragment newInstance(boolean bacABoolean) {
+        PhotoAlbumFragment f = new PhotoAlbumFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("check", bacABoolean);
+        f.setArguments(args);
+        return f;
     }
 
 

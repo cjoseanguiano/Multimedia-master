@@ -35,10 +35,17 @@ public class VideoAlbumFragment extends Fragment implements MediaAdapterAllAlbum
     private boolean backPressed = false;
     public static ArrayList<DataPicturesAlbum> modelimages = new ArrayList<>();
 
-    @SuppressLint("ValidFragment")
-    public VideoAlbumFragment(boolean backPressed) {
-        this.backPressed = backPressed;
-
+//    @SuppressLint("ValidFragment")
+//    public VideoAlbumFragment(boolean backPressed) {
+//        this.backPressed = backPressed;
+//
+//    }
+    public static VideoAlbumFragment newInstance(boolean backPressed) {
+        VideoAlbumFragment f = new VideoAlbumFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("check", backPressed);
+        f.setArguments(args);
+        return f;
     }
 
     public interface OnMediaSelectedVideoAlbum {

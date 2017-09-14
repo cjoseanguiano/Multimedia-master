@@ -6,11 +6,15 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -37,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity.ShowMediaFileActivity.CAPTURE_PHOTO;
 import static com.bsdenterprise.carlos.anguiano.multimedia.VideoPlayer.Activity.VideoPlayerActivity.CAPTURE_VIDEO;
 
@@ -54,8 +59,9 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private static final int REQUEST_TAKE_VIDEO = 85;
     private static final int EXTRA_TAKE_VIDEO = 86;
     private static final int REQUEST_CAMERA = 0;
-//    static final Integer PHOTO_CAMERA = 0x1;
-//    static final Integer VIDEO_CAMERA = 0x2;
+    private static final String CURRENT_VIDEO_FILE_PATH = "current_video_file_path";
+    private static final String CURRENT_PHOTO_FILE_PATH = "current_photo_file_path";
+    //    static final Integer VIDEO_CAMERA = 0x2;
     private String body;
     private boolean backPressed = false;
     public static final String EXTRA_BACK_SELECT = "extra_back_select";
@@ -68,9 +74,12 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private TabLayout tabLayout;
     private Uri photoURI;
     private int checkTypePermission;
+    private File photoFile;
+    private File videoFile;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+//      protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_list_multimedia);
         Log.i(TAG, "onCreate: ");
@@ -78,6 +87,16 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         label_Photo = getResources().getString(R.string.image);
         label_Video = getResources().getString(R.string.video);
 
+        if (savedInstanceState != null) {
+            String videoFilePath = savedInstanceState.getString(CURRENT_VIDEO_FILE_PATH);
+            if (videoFilePath != null) {
+                videoFile = new File(videoFilePath);
+            }
+            String photoFilePath = savedInstanceState.getString(CURRENT_PHOTO_FILE_PATH);
+            if (photoFilePath != null) {
+                photoFile = new File(photoFilePath);
+            }
+        }
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -220,8 +239,12 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         if (getIntent().hasExtra(BACK_PRESSED)) {
             backPressed = true;
         }
-        adapter.addFragment(new PhotoAlbumFragment(backPressed), label_Photo);
-        adapter.addFragment(new VideoAlbumFragment(backPressed), label_Video);
+//        adapter.addFragment(new PhotoAlbumFragment(backPressed), label_Photo);
+//        adapter.addFragment(new VideoAlbumFragment(backPressed), label_Video);
+
+        adapter.addFragment(PhotoAlbumFragment.newInstance(backPressed), label_Photo);
+        adapter.addFragment(VideoAlbumFragment.newInstance(backPressed), label_Video);
+        viewPager.setAdapter(adapter);
         viewPager.setAdapter(adapter);
     }
 
@@ -268,36 +291,29 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 
     }
 
-    private void dispatchTakePictureIntent() throws IOException {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile;
-            try {
-                photoFile = MultimediaUtilities.createImageFile();
-            } catch (IOException ex) {
-                return;
-            }
-            if (photoFile != null) {
-                photoURI = Uri.fromFile(MultimediaUtilities.createImageFile());
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (videoFile != null) {
+            outState.putString(CURRENT_VIDEO_FILE_PATH, videoFile.getAbsolutePath());
+        }
+        if (photoFile != null) {
+            outState.putString(CURRENT_PHOTO_FILE_PATH, photoFile.getAbsolutePath());
         }
     }
-
 
     private void dispatchTakeVideoIntent() throws IOException {
         Log.i(TAG, "dispatchTakeVideoIntent: ");
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
         if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile;
             try {
-                photoFile = MultimediaUtilities.createVideoFile();
+                videoFile = MultimediaUtilities.createVideoFile();
             } catch (IOException ex) {
                 return;
             }
-            if (photoFile != null) {
+            if (videoFile != null) {
                 photoURI = Uri.fromFile(MultimediaUtilities.createVideoFile());
                 takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takeVideoIntent, REQUEST_TAKE_VIDEO);
@@ -306,23 +322,44 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 
     }
 
+    private void dispatchTakePictureIntent() throws IOException {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            try {
+                photoFile = MultimediaUtilities.createImageFile();
+            } catch (IOException ex) {
+                return;
+            }
+            if (photoFile != null) {
+                takePictureIntent.setFlags(FLAG_GRANT_READ_URI_PERMISSION);
+                photoURI = Uri.fromFile(MultimediaUtilities.createImageFile());
+                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                            Uri.fromFile(photoFile));
+                }
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
 
-            Uri imageUri = Uri.parse(photoURI.toString());
-            Intent intent = new Intent(this, ShowMediaFileActivity.class);
-            intent.putExtra(CAPTURE_PHOTO, imageUri.getPath());
-            startActivity(intent);
-            this.finish();
+            Intent i = new Intent(this, ShowMediaFileActivity.class);
+            i.putExtra(CAPTURE_PHOTO, photoFile.getAbsolutePath());
+            startActivityForResult(i, 10);
 
-            MediaScannerConnection.scanFile(MainAlbumListActivity.this,
-                    new String[]{imageUri.getPath()}, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
-                        }
-                    });
+
+//                Uri imageUri = Uri.parse(photoURI.toString());
+//                Intent intent = new Intent(this, ShowMediaFileActivity.class);
+//                intent.putExtra(CAPTURE_PHOTO, imageUri.getPath());
+//                startActivity(intent);
+//                this.finish();
+
+
         }
         if (requestCode == REQUEST_TAKE_VIDEO && resultCode == RESULT_OK) {
             Log.i(TAG, "onActivityResult: ");
