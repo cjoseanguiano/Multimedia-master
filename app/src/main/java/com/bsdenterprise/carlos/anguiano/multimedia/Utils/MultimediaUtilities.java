@@ -212,22 +212,6 @@ public class MultimediaUtilities {
         }
     }
 
-
-/*    public static File createImageFilex() throws IOException {
-        String timeStampPhoto = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStampPhoto + "_";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM), "Camera");
-        File image = File.createTempFile(
-                imageFileName,
-                ".jpg",
-                storageDir
-        );
-
-        String mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return image;
-    }*/
-
     public static File createImageFile() throws IOException {
         String timeStampPhoto = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "C_" + timeStampPhoto + "_";

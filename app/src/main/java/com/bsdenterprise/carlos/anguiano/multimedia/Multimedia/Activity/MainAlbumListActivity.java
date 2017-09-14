@@ -1,19 +1,25 @@
 package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.LoginFilter;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +54,8 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private static final int REQUEST_TAKE_VIDEO = 85;
     private static final int EXTRA_TAKE_VIDEO = 86;
     private static final int REQUEST_CAMERA = 0;
+//    static final Integer PHOTO_CAMERA = 0x1;
+//    static final Integer VIDEO_CAMERA = 0x2;
     private String body;
     private boolean backPressed = false;
     public static final String EXTRA_BACK_SELECT = "extra_back_select";
@@ -58,8 +66,8 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
     private FloatingActionButton floatingActionButton;
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    //    private String mCurrentPhotoPath;
     private Uri photoURI;
+    private int checkTypePermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,22 +82,15 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
             @Override
             public void onClick(View view) {
                 if (tabLayout.getSelectedTabPosition() == 1) {
-                    Toast.makeText(MainAlbumListActivity.this, "Select Video", Toast.LENGTH_SHORT).show();
                     floatingActionButton.hide();
-                    try {
-                        dispatchTakeVideoIntent();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    checkTypePermission = 1;
+                    askForPermission(Manifest.permission.CAMERA, REQUEST_TAKE_VIDEO);
 
                 } else {
-                    Toast.makeText(MainAlbumListActivity.this, "Select Camera", Toast.LENGTH_SHORT).show();
                     floatingActionButton.hide();
-                    try {
-                        dispatchTakePictureIntent();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    checkTypePermission = 0;
+                    askForPermission(Manifest.permission.CAMERA, REQUEST_TAKE_PHOTO);
+
                 }
             }
         });
@@ -143,51 +144,66 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 
     }
 
-//    public void showCamera() {
-//        Log.i(TAG, "Show camera button pressed. Checking permission.");
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            requestCameraPermission();
-//
-//        } else {
-//            Log.i(TAG, "CAMERA permission has already been granted. Displaying camera preview.");
-//            try {
-//                dispatchTakePictureIntent();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-    private void requestCameraPermission() {
-        Log.i(TAG, "CAMERA permission has NOT been granted. Requesting permission.");
-
-        // BEGIN_INCLUDE(camera_permission_request)
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-            // Provide an additional rationale to the user if the permission was not granted
-            // and the user would benefit from additional context for the use of the permission.
-            // For example if the user has previously denied the permission.
-            Log.i(TAG,
-                    "Displaying camera permission rationale to provide additional context.");
-            Snackbar.make(viewPager, R.string.permission_camera_rationale,
-                    Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            ActivityCompat.requestPermissions(MainAlbumListActivity.this,
-                                    new String[]{Manifest.permission.CAMERA},
-                                    REQUEST_CAMERA);
-                        }
-                    })
-                    .show();
+    private void askForPermission(String permission, Integer requestCode) {
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            }
         } else {
-
-            // Camera permission has not been granted yet. Request it directly.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    REQUEST_CAMERA);
+            switch (checkTypePermission) {
+                case 0:
+                    Log.i(TAG, "askForPermission: dispatchTakePictureIntent");
+                    try {
+                        dispatchTakePictureIntent();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 1:
+                    Log.i(TAG, "askForPermission: dispatchTakeVideoIntent");
+                    try {
+                        dispatchTakeVideoIntent();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    Log.i(TAG, "askForPermission: default");
+                    break;
+            }
         }
-        // END_INCLUDE(camera_permission_request)
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.i(TAG, "onRequestPermissionsResult: ");
+        if (ActivityCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED) {
+            switch (requestCode) {
+                //Location
+                case 1:
+                    try {
+                        dispatchTakePictureIntent();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 2:
+                    try {
+                        dispatchTakeVideoIntent();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+
+            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 
@@ -314,9 +330,6 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
             Intent videoPlayer = new Intent(this, VideoPlayerActivity.class);
             videoPlayer.putExtra(CAPTURE_VIDEO, imageUri.getPath());
             startActivityForResult(videoPlayer, EXTRA_TAKE_VIDEO);
-
-//            startActivity(videoPlayer);
-//            this.finish();
         }
         if (requestCode == EXTRA_TAKE_VIDEO && resultCode == RESULT_OK) {
             Uri imageUri = Uri.parse(photoURI.toString());
@@ -328,11 +341,6 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
             intent.putExtra(ShowMediaFileActivity.EXTRA_RESULT_SELECTED_VIDEO, pathVideo);
             startActivity(intent);
             this.finish();
-
-            /*i.putExtra(ShowMediaFileActivity.EXTRA_RESULT_SELECTED_VIDEO, mImagePaths);
-                        i.putExtra(EXTRA_TYPE_BUCKET, data.getStringExtra(EXTRA_TYPE_BUCKET));
-                        i.putExtra(EXTRA_TYPE_FILE, data.getStringExtra(EXTRA_TYPE_FILE));
-                        startActivityForResult(i, RESULT_VIDEO_SELECTED_MULTIMEDIA);*/
             MediaScannerConnection.scanFile(MainAlbumListActivity.this,
                     new String[]{imageUri.getPath()}, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
