@@ -271,6 +271,13 @@ public class ShowMediaFileActivity extends AppCompatActivity {
         Log.d("image is edit", isImageEdit + "");
 //        LoadImageTask loadTask = new LoadImageTask();
 //        loadTask.execute(newFilePath);
+
+        mImagePath.clear();
+        mImagePath.add(newFilePath);
+        adapter = new ShowMediaAdapter(this, mImagePath);
+        inflateThumbnails(mImagePath);
+        createViewPager();
+
     }
 
     @Override
@@ -323,7 +330,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     }
 
     private void editImageClick(String pathComplete) {
-        viewPager = null;
+        viewPager.removeAllViews();
         File outputFile = FileUtils.genEditFile();
         EditImageActivity.start(this, pathComplete, outputFile.getAbsolutePath(), ACTION_REQUEST_EDITIMAGE);
         Log.i(TAG, "editImageClick: ");
