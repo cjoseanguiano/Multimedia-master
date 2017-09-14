@@ -4,4 +4,5 @@
     <item name="viewPagerMultimedia" type="id" />
     <item name="viewImageMultimedia" type="id" />
     <item name="info_multimedia" type="id" />
+    <item name="edit_photo" type="id">edit Photo</item>
 </resources>

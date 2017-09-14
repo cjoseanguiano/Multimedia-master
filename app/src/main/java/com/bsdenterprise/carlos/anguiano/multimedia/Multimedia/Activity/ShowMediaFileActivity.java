@@ -24,12 +24,14 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Adapter.ShowMediaAdapter;
 import com.bsdenterprise.carlos.anguiano.multimedia.R;
 import com.bumptech.glide.Glide;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+import com.xinlan.imageeditlibrary.editimage.EditImageActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,6 +48,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     public static final String EXTRA_RESULT_SELECTED_VIDEO = "extra_result_selected_video";
     private static final String EXTRA_TYPE_BUCKET = "extra_type_bucket";
     private static final String EXTRA_TYPE_FILE = "extra_type_file";
+    public static final int ACTION_REQUEST_EDITIMAGE = 9;
 
     private EditText photoDescription;
     private ViewPager viewPager;
@@ -167,6 +170,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
         mImagePath = getIntent().getExtras().getStringArrayList(EXTRA_RESULT_SELECTED_PICTURE);
         typeBucket = getIntent().getStringExtra(EXTRA_TYPE_BUCKET);
         typeFile = getIntent().getStringExtra(EXTRA_TYPE_FILE);
+        Log.i(TAG, "showIntent: ");
     }
 
     public void createImageViewNew() {
@@ -244,12 +248,30 @@ public class ShowMediaFileActivity extends AppCompatActivity {
                 }
             }
         }
+        if (requestCode == ACTION_REQUEST_EDITIMAGE && resultCode == Activity.RESULT_OK) {
+            Log.i(TAG, "onActivityResult: ");
+            handleEditorImage(data);
+        }
         if (requestCode == 20 && resultCode == Activity.RESULT_CANCELED) {
             Log.i(TAG, "onActivityResult: ");
             onBackPressed();
         }
     }
 
+    private void handleEditorImage(Intent data) {
+        String newFilePath = data.getStringExtra(EditImageActivity.EXTRA_OUTPUT);
+        boolean isImageEdit = data.getBooleanExtra(EditImageActivity.IMAGE_IS_EDIT, false);
+
+        if (isImageEdit) {
+            Toast.makeText(this, getString(R.string.ok, newFilePath), Toast.LENGTH_LONG).show();
+        } else {
+            newFilePath = data.getStringExtra(EditImageActivity.FILE_PATH);
+
+        }
+        Log.d("image is edit", isImageEdit + "");
+//        LoadImageTask loadTask = new LoadImageTask();
+//        loadTask.execute(newFilePath);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -259,6 +281,10 @@ public class ShowMediaFileActivity extends AppCompatActivity {
             MenuItem item = menu.add(Menu.NONE, R.id.crop_image_menu_crop, Menu.NONE, R.string.crop_image_menu_crop);
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             item.setIcon(R.drawable.crop_multimedia);
+
+            MenuItem item1 = menu.add(Menu.NONE, R.id.edit_photo, Menu.NONE, R.string.edit);
+            item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            item1.setIcon(R.drawable.ic_edit);
         }
         return true;
     }
@@ -267,22 +293,40 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.crop_image_menu_crop) {
+            Log.i(TAG, "onOptionsItemSelected: ");
             final int[] chatMessage = new int[1];
             chatMessage[0] = adapter.getItemPosition(currentPage);
             position = viewPager.getCurrentItem();
 
-            String pos = adapter.getCurrentItem(position);
-            CropImage.activity(Uri.fromFile(new File(pos)))
+            String path = adapter.getCurrentItem(position);
+            CropImage.activity(Uri.fromFile(new File(path)))
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .start(this);
             return true;
         } else if (id == android.R.id.home) {
             onBackPressed();
             return true;
+        } else if (id == R.id.edit_photo) {
+            Log.i(TAG, "onOptionsItemSelected: ");
+            final int[] chatMessage = new int[1];
+            chatMessage[0] = adapter.getItemPosition(currentPage);
+            position = viewPager.getCurrentItem();
+            String path = adapter.getCurrentItem(position);
+            File file = new File(path);
+            String pathComplete = file.getPath();
+            editImageClick(pathComplete);
+            return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    private void editImageClick(String pathComplete) {
+        viewPager = null;
+        File outputFile = FileUtils.genEditFile();
+        EditImageActivity.start(this, pathComplete, outputFile.getAbsolutePath(), ACTION_REQUEST_EDITIMAGE);
+        Log.i(TAG, "editImageClick: ");
     }
 
     private void cancelSend() {
