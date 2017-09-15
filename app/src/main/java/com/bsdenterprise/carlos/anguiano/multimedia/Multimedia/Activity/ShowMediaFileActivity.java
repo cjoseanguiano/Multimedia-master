@@ -398,6 +398,6 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.i(TAG, "onPause: ");
-//        thumbnailsContainer.removeAllViews();
+        thumbnailsContainer.removeAllViews();
     }
 }
