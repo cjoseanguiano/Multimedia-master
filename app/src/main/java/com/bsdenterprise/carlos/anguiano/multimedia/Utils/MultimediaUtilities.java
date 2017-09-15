@@ -2,6 +2,7 @@ package com.bsdenterprise.carlos.anguiano.multimedia.Utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -241,4 +242,19 @@ public class MultimediaUtilities {
         return new File(storageDir + File.separator + imageFileName + ".mp4");
     }
 
+    public static String StringBuilder(ArrayList<String> paths) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < paths.size(); i++) {
+            result.append(paths.get(i));
+        }
+        String fileString = result.toString();
+        return fileString;
+    }
+
+    public static ArrayList<String> selectedPhoto(Intent data) {
+        if (data != null) {
+            return data.getExtras().getStringArrayList("paths");
+        }
+        return null;
+    }
 }
