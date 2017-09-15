@@ -269,7 +269,7 @@ public class ShowMediaFileActivity extends AppCompatActivity {
 
         }
         Log.d("image is edit", isImageEdit + "");
-        mImagePath.clear();
+//        mImagePath.clear();
         mImagePath.add(newFilePath);
         adapter.refreshData(new ArrayList<>(mImagePath));
         adapter = new ShowMediaAdapter(this, mImagePath);
@@ -330,6 +330,8 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     private void editImageClick(String pathComplete) {
         viewPager.removeAllViews();
         File outputFile = FileUtils.genEditFile();
+        mImagePath.remove(position);
+        adapter.refreshData(new ArrayList<>(mImagePath));
         EditImageActivity.start(this, pathComplete, outputFile.getAbsolutePath(), ACTION_REQUEST_EDITIMAGE);
         Log.i(TAG, "editImageClick: ");
     }
@@ -396,6 +398,6 @@ public class ShowMediaFileActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.i(TAG, "onPause: ");
-        thumbnailsContainer.removeAllViews();
+//        thumbnailsContainer.removeAllViews();
     }
 }
