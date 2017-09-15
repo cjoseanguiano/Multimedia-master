@@ -1,29 +1,23 @@
 package com.bsdenterprise.carlos.anguiano.multimedia.Multimedia.Activity;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.LoginFilter;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -245,7 +239,6 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         adapter.addFragment(PhotoAlbumFragment.newInstance(backPressed), label_Photo);
         adapter.addFragment(VideoAlbumFragment.newInstance(backPressed), label_Video);
         viewPager.setAdapter(adapter);
-        viewPager.setAdapter(adapter);
     }
 
     public static void startForResult(Activity activity, String name, String jid, int RESULT_CODE) {
@@ -348,7 +341,20 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
 
-            Intent i = new Intent(this, ShowMediaFileActivity.class);
+            Intent intent = new Intent(this, ShowMediaFileActivity.class);
+            intent.putExtra(CAPTURE_PHOTO, photoFile.getAbsolutePath());
+            startActivity(intent);
+            this.finish();
+
+            MediaScannerConnection.scanFile(MainAlbumListActivity.this,
+                    new String[]{photoFile.getAbsolutePath()}, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                        }
+                    });
+
+
+/*            Intent i = new Intent(this, ShowMediaFileActivity.class);
             i.putExtra(CAPTURE_PHOTO, photoFile.getAbsolutePath());
             startActivityForResult(i, 10);
 
@@ -358,7 +364,7 @@ public class MainAlbumListActivity extends AppCompatActivity implements PhotoAlb
 //                intent.putExtra(CAPTURE_PHOTO, imageUri.getPath());
 //                startActivity(intent);
 //                this.finish();
-
+*/
 
         }
         if (requestCode == REQUEST_TAKE_VIDEO && resultCode == RESULT_OK) {
