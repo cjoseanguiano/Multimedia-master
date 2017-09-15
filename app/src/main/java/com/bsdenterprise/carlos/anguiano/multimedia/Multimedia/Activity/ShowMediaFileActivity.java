@@ -269,11 +269,9 @@ public class ShowMediaFileActivity extends AppCompatActivity {
 
         }
         Log.d("image is edit", isImageEdit + "");
-//        LoadImageTask loadTask = new LoadImageTask();
-//        loadTask.execute(newFilePath);
-
         mImagePath.clear();
         mImagePath.add(newFilePath);
+        adapter.refreshData(new ArrayList<>(mImagePath));
         adapter = new ShowMediaAdapter(this, mImagePath);
         inflateThumbnails(mImagePath);
         createViewPager();

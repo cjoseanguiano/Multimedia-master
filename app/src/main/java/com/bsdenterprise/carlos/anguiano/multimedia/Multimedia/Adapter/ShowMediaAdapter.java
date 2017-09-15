@@ -107,4 +107,9 @@ public class ShowMediaAdapter extends PagerAdapter {
         } else
             return null;
     }
+
+    public void refreshData(ArrayList<String> path) {
+        mImagePath = new ArrayList<>(path);
+        notifyDataSetChanged();
+    }
 }
